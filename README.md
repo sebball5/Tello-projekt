@@ -14,4 +14,9 @@ egenskaber:
   rotere med og mod uret
   kan flyve ud fra koordinater, i en bane eller kurve
   den kan flip 
-  
+
+
+
+  ### Brainstorm
+  - man kan lave noget der reagere på stemmer.
+  - 
