@@ -19,6 +19,4 @@ egenskaber:
 
   ### Problemformulering
   - Vi vil meget gerne lave en nemmere måde at styre dronen på, da den lige nu skal programeres, det vil vi gerne ændre til en mere brugervenlig overflade.
-    
-  ### hardware
-  - vi vil gerne bruge en arduino uno, nogle joysticks og nogle knapper 
+
