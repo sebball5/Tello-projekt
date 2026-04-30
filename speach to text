@@ -1,0 +1,64 @@
+import speech_recognition as sr
+r = sr.Recognizer()
+
+from djitellopy import Tello
+import time
+
+Tello.connect()
+print("Battery:", Tello.get_battery())
+
+while True:
+    try:
+        with sr.Microphone() as source:
+            print("lytter.......")
+            
+            #gør så den lytter efter, selvom der er støj i rummet
+            r.adjust_for_ambient_noise(source, duration=0.2)
+            #lytter til havd man siger
+            audio = r.listen(source)
+            #sammenligner lyden til google tyske lydbibilotek
+            text = r.recognize_google(audio, language="de-DE")
+            #lovercaser teksten
+            text = text.lower()  
+
+            print("Du sage:", text)
+
+            if(text == "abheben"):
+                Tello.takeoff()
+
+            elif(text == "hoch"):
+                Tello.move_up(50)
+            
+            elif(text == "runter"):
+                Tello.move_down(50)
+
+            elif(text == "vorwarts"):
+                Tello.move_forward(50)
+            
+            elif(text == "ruckwarts"):
+                Tello.move_back(50)
+
+            elif(text == "rechts"):
+                Tello.move_right(50)
+            
+            elif(text == "links"):
+                Tello.move_left(50)
+
+            elif(text == "israel"):
+                Tello.land
+
+
+            
+            if "exit" in text:
+                print("slukker programmet:")
+                break
+
+    except sr.RequestError as e:
+        print("gad kke virke {0}".format(e))
+
+    except sr.UnknownValueError:
+        print("kunne ikke forstå dig")
+
+    except KeyboardInterrupt:
+        print("program slukket")
+        break 
