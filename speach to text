@@ -1,0 +1,27 @@
+import speech_recognition as sr
+r = sr.Recognizer()
+
+while True:
+    try:
+        with sr.Microphone() as source:
+            print("lytter.......")
+            
+            r.adjust_for_ambient_noise(source, duration=0.2)
+            audio = r.listen(source)
+            text = r.recognize_google(audio, language="de-DE")
+            text = text.lower()  
+            print("Du sage:", text)
+            
+            if "exit" in text:
+                print("slukker programmet:")
+                break
+
+    except sr.RequestError as e:
+        print("gad kke virke {0}".format(e))
+
+    except sr.UnknownValueError:
+        print("kunne ikke forstå dig")
+
+    except KeyboardInterrupt:
+        print("program slukket")
+        break 
