@@ -22,6 +22,10 @@ egenskaber:
     
 ### Flowchart
 
+<img width="625" height="706" alt="image" src="https://github.com/user-attachments/assets/a3c96fa9-6700-4ac7-a006-f852dd1487ef" />
+
+flowchartet delt i 2, den øverste del til venstre, den nederste til højer
+
 ### Blokdiagram
 
 <img width="975" height="494" alt="image" src="https://github.com/user-attachments/assets/a7bf5324-f86e-4d55-9656-38aa75482729" />
