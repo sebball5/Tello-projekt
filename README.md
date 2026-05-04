@@ -20,3 +20,8 @@ egenskaber:
   ### Problemformulering
   - Vi vil meget gerne lave en nemmere måde at styre dronen på, da den lige nu skal programeres, det vil vi gerne ændre til en mere brugervenlig overflade.
 
+### Blokdiagram
+
+<img width="975" height="494" alt="image" src="https://github.com/user-attachments/assets/a7bf5324-f86e-4d55-9656-38aa75482729" />
+
+som der ses på blokdiagrammet snakker manden tysk, computerens mikrofon opfanger det og sender det til google API tyske lydbibliotek. Lydbibilioteket registrere så hvilken lyd det er og skriver det tilbage til computeren. computeren tjekker så hvilken command der korropondere til lyden, dronen aflyder så ordren.
