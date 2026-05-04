@@ -19,6 +19,8 @@ egenskaber:
 
   ### Problemformulering
   - Vi vil meget gerne lave en nemmere måde at styre dronen på, da den lige nu skal programeres, det vil vi gerne ændre til en mere brugervenlig overflade.
+    
+### Flowchart
 
 ### Blokdiagram
 
@@ -29,3 +31,8 @@ som der ses på blokdiagrammet snakker manden tysk, computerens mikrofon opfange
 ### Trelags model 
 
 <img width="653" height="700" alt="image" src="https://github.com/user-attachments/assets/e41fe399-95d0-47fc-8aeb-e22d6fa81a2d" />
+
+### Client- Server akitektuktur
+
+<img width="975" height="364" alt="image" src="https://github.com/user-attachments/assets/16c4743b-b10c-439d-b80f-f01b7ff85b52" />
+
