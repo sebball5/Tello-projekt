@@ -40,3 +40,7 @@ som der ses på blokdiagrammet snakker manden tysk, computerens mikrofon opfange
 
 <img width="975" height="364" alt="image" src="https://github.com/user-attachments/assets/16c4743b-b10c-439d-b80f-f01b7ff85b52" />
 
+
+##bruger test 
+vi har valgt at lave en bruger test til at finde ud af om en meget ukompatent person kan få vores drone til at flyve. 
+derfor har vi valgt en person fra målgruppen (Tue), til at få dronen til at lætte flyve en rundte og lande igen.
