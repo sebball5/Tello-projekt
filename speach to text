@@ -1,3 +1,4 @@
+
 import socket
 
 import speech_recognition as sr
@@ -76,3 +77,230 @@ while True:
     except KeyboardInterrupt:
         print("program slukket")
         break
+
+
+
+
+
+
+GUI kode 
+
+import socket
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+class TransmitterGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("UDP Broadcast Transmitter")
+        self.root.geometry("500x400")
+        
+        self.transmitter = None
+        self.sourceIP = None
+        self.broadcast_Port = 8002
+        
+        # Get available IPs
+        self.get_all_ips()
+        
+        # Frame for IP selection
+        ip_frame = ttk.Frame(root, padding="10")
+        ip_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        
+        ttk.Label(ip_frame, text="Select Network Interface:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        
+        self.ip_var = tk.StringVar()
+        self.ip_combo = ttk.Combobox(ip_frame, textvariable=self.ip_var, values=self.allips, state="readonly", width=30)
+        self.ip_combo.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=5, pady=5)
+        
+        # Connect button
+        ttk.Button(ip_frame, text="Connect", command=self.connect).grid(row=0, column=2, padx=5, pady=5)
+        
+        # Status label
+        self.status_var = tk.StringVar(value="Disconnected")
+        ttk.Label(ip_frame, textvariable=self.status_var, foreground="red").grid(row=1, column=0, columnspan=3, pady=5)
+        
+        # Frame for message input
+        msg_frame = ttk.Frame(root, padding="10")
+        msg_frame.grid(row=1, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), padx=10, pady=10)
+        
+        ttk.Label(msg_frame, text="Message to Send:").grid(row=0, column=0, sticky=tk.W, pady=5)
+        
+        self.msg_entry = ttk.Entry(msg_frame, width=40)
+        self.msg_entry.grid(row=1, column=0, sticky=(tk.W, tk.E), pady=5)
+        self.msg_entry.bind('<Return>', lambda e: self.send_message())
+        
+        # Send button
+        ttk.Button(msg_frame, text="Send", command=self.send_message).grid(row=2, column=0, pady=10)
+        
+        # Log area
+        ttk.Label(msg_frame, text="Log:").grid(row=3, column=0, sticky=tk.W, pady=(10, 5))
+        
+        self.log_text = tk.Text(msg_frame, height=10, width=50)
+        self.log_text.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
+        
+        scrollbar = ttk.Scrollbar(msg_frame, orient="vertical", command=self.log_text.yview)
+        scrollbar.grid(row=4, column=1, sticky=(tk.N, tk.S), padx=(0, 5))
+        self.log_text.config(yscrollcommand=scrollbar.set)
+    
+    def get_all_ips(self):
+        """Get all available LAN IPs for this computer"""
+        interfaces = socket.getaddrinfo(host=socket.gethostname(), port=None, family=socket.AF_INET)
+        self.allips = [ip[-1][0] for ip in interfaces]
+    
+    def connect(self):
+        """Connect to the selected interface"""
+        if not self.ip_var.get():
+            messagebox.showerror("Error", "Please select a network interface")
+            return
+        
+        try:
+            self.sourceIP = self.ip_var.get()
+            self.transmitter = self.get_socket(self.sourceIP)
+            self.status_var.set(f"Connected - TX from {self.sourceIP} on port {self.broadcast_Port}")
+            self.status_var.set(f"Connected - TX from {self.sourceIP} on port {self.broadcast_Port}")
+            self.root.nametowidget(self.root.winfo_children()[0]).winfo_children()[1].config(foreground="green")
+            self.log("Connected successfully to " + self.sourceIP)
+        except Exception as e:
+            messagebox.showerror("Connection Error", str(e))
+            self.log(f"Error: {str(e)}")
+    
+    def get_socket(self, sourceIP):
+        """Create and configure UDP socket"""
+        transmitter = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        transmitter.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        transmitter.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        transmitter.bind((sourceIP, 0))
+        return transmitter
+    
+    def send_message(self):
+        """Send broadcast message"""
+        if not self.transmitter:
+            messagebox.showerror("Error", "Not connected. Please connect first.")
+            return
+        
+        msg = self.msg_entry.get().strip()
+        if not msg:
+            messagebox.showwarning("Warning", "Please enter a message")
+            return
+        
+        try:
+            tx = msg.encode()
+            broadcast_tuple = ('<broadcast>', self.broadcast_Port)
+            self.transmitter.sendto(tx, broadcast_tuple)
+            self.log(f"Sent: {msg}")
+            self.msg_entry.delete(0, tk.END)
+        except Exception as e:
+            messagebox.showerror("Send Error", str(e))
+            self.log(f"Error sending: {str(e)}")
+    
+    def log(self, message):
+        """Add message to log"""
+        self.log_text.insert(tk.END, message + "\n")
+        self.log_text.see(tk.END)
+        self.root.update()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TransmitterGUI(root)
+    root.mainloop()
+
+
+
+
+
+
+Receiver 
+
+import socket
+from IPy import IP
+from djitellopy import Tello
+import time
+tello = Tello()
+tello.connect() 
+print("Battery:", tello.get_battery()) 
+
+#Asks user to select an IP, address as source for broadcasting.
+
+def selectInterface():
+    interfaces = socket.getaddrinfo(host=socket.gethostname(), port=None, family=socket.AF_INET)
+    allips = [ip[-1][0] for ip in interfaces]
+
+    print("Here's all the LAN IPs for this computer:")
+    i=0
+    for ip in allips:
+        print(f"{i}: {ip}")
+        i+=1
+    choice = int(input("Which one would you like to use to transmit? "))
+    interface = allips[choice]
+
+    #interface = interface[0]
+    #print(f"chose {interface}")
+    # create a socket object
+
+    return interface
+
+
+def listen(IPAddr):
+    #hostname = socket.gethostname()
+    #IPAddr = socket.gethostbyname(hostname)
+
+    #print("Your Computer IP Address is:" + IPAddr)
+
+    # create a socket object
+    listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # UDP
+    listener.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    #TX_port = 8001
+    RX_port = 8002
+    listen_addr = ("", RX_port)
+
+    listener.bind(listen_addr)
+
+    print(f"Listening on port {RX_port}")
+
+    while True:
+        data, addr = listener.recvfrom(1024)
+
+        remoteIP = IP(addr[0]).strNormal()  # convert address of packet origin to string
+        received = data.decode("utf-8").strip()  # convert bytes to string
+        text = received.lower()
+
+
+        print(f"Received {received} from {remoteIP}")
+
+        if("Wurst" in received.lower()):
+            print ("Dronen lætter")
+            tello.takeoff()
+
+        elif("hoch" in received.lower()):
+            tello.move_up(50)
+            print ("Dronen flyver op")
+
+        elif("runter" in received.lower()):
+            tello.move_down(50)
+            print ("Dronen flyver ned")
+
+        elif("geredeaus" in received.lower()):
+            tello.move_forward(50)
+            print ("Dronen flyver forud")
+
+        elif("ruckwarts" in received.lower()):
+            tello.move_back(50)
+            print ("Dronen flyver bagud")
+
+        elif("rechts" in received.lower()):
+            tello.move_right(50)
+            print ("Dronen flyver højre")
+
+        elif("links" in received.lower()):
+            tello.move_left(50)
+            print ("Dronen flyver venstre")
+
+        elif("israel" in received.lower()):
+            tello.land()
+        addr = selectInterface()
+        listen(addr)
+
+
+
