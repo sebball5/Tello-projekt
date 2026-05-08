@@ -1,13 +1,50 @@
+import socket
+
 import speech_recognition as sr
 r = sr.Recognizer()
 
-from djitellopy import Tello
-import time
+#Asks user to select an IP address to listen for broadcasted messages.
 
-Tello.connect()
-print("Battery:", Tello.get_battery())
+def selectInterface():
+    interfaces = socket.getaddrinfo(host=socket.gethostname(), port=None, family=socket.AF_INET)
+    allips = [ip[-1][0] for ip in interfaces]
+
+    print("Here's all the LAN IPs for this computer:")
+    i=0
+    for ip in allips:
+        print(f"{i}: {ip}")
+        i+=1
+    choice = int(input("Which one would you like to use to transmit? "))
+    interface = allips[choice]
+
+    #interface = interface[0]
+    #print(f"chose {interface}")
+    # create a socket object
+
+    return interface
+
+
+
+def getSocket(sourceIP):
+    transmitter = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # UDP
+    #print(broadcast_addr)
+    transmitter.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    transmitter.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    transmitter.bind((sourceIP, 0)) #open an outgoing port on chosen interface. Don't care about port number :)
+    return transmitter
+
+def transmit(msg, conn, dest):
+        conn.sendto(tx,dest)
+
+
+broadcast_Port = 8002
+sourceIP = selectInterface()
+broadcast_tuple = ('<broadcast>',broadcast_Port)
+transmitter = getSocket(sourceIP)
+print(f"Ready to TX from {sourceIP} to port {broadcast_Port}")
 
 while True:
+
     try:
         with sr.Microphone() as source:
             print("lytter.......")
@@ -21,33 +58,10 @@ while True:
             #lovercaser teksten
             text = text.lower()  
 
-            print("Du sage:", text)
+            print("Du sagde:", text)
 
-            if(text == "abheben"):
-                Tello.takeoff()
-
-            elif(text == "hoch"):
-                Tello.move_up(50)
-            
-            elif(text == "runter"):
-                Tello.move_down(50)
-
-            elif(text == "vorwarts"):
-                Tello.move_forward(50)
-            
-            elif(text == "ruckwarts"):
-                Tello.move_back(50)
-
-            elif(text == "rechts"):
-                Tello.move_right(50)
-            
-            elif(text == "links"):
-                Tello.move_left(50)
-
-            elif(text == "israel"):
-                Tello.land
-
-
+            tx = text.strip().encode()
+            transmit(tx,transmitter,broadcast_tuple)
             
             if "exit" in text:
                 print("slukker programmet:")
@@ -61,4 +75,4 @@ while True:
 
     except KeyboardInterrupt:
         print("program slukket")
-        break 
+        break
